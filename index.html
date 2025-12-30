@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>谁"最有可能"问题库</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .question-container {
+            padding: 40px 30px;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .question-number {
+            font-size: 1rem;
+            color: #ff7e5f;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .question-box {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 40px 30px;
+            width: 100%;
+            margin: 20px 0;
+            border-left: 5px solid #ff7e5f;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .question {
+            font-size: 1.8rem;
+            color: #333;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #555;
+            border: 2px solid #eaeaea;
+        }
+        
+        .btn-secondary:hover {
+            background: #eaeaea;
+            transform: translateY(-3px);
+        }
+        
+        .progress-container {
+            padding: 20px 30px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        
+        .progress-text {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #eaeaea;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            width: 1%;
+            transition: width 0.5s ease;
+        }
+        
+        footer {
+            padding: 15px;
+            text-align: center;
+            color: #888;
+            font-size: 0.8rem;
+            background-color: #f1f1f1;
+        }
+        
+        .history-container {
+            padding: 15px 30px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        
+        .history-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .history-item {
+            background-color: #eaeaea;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .question {
+                font-size: 1.5rem;
+            }
+            
+            .question-box {
+                padding: 30px 20px;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .controls {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>谁"最有可能"问题库</h1>
+            <div class="subtitle">100个灵魂拷问 - 每次随机显示一条</div>
+        </header>
+        
+        <div class="question-container">
+            <div class="question-number">问题 #<span id="question-id">1</span></div>
+            <div class="question-box">
+                <div class="question" id="question-text">谁前任最多</div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="next-btn">
+                    <i class="fas fa-random"></i> 随机下一题
+                </button>
+                <button class="btn btn-secondary" id="prev-btn">
+                    <i class="fas fa-arrow-left"></i> 上一题
+                </button>
+                <button class="btn btn-secondary" id="show-all-btn">
+                    <i class="fas fa-list"></i> 显示全部问题
+                </button>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-text">已浏览 <span id="viewed-count">1</span>/100 题</div>
+            <div class="progress-bar">
+                <div class="progress" id="progress-bar"></div>
+            </div>
+        </div>
+        
+        <div class="history-container">
+            <div class="history-title">浏览历史</div>
+            <div class="history-list" id="history-list">
+                <div class="history-item">#1 谁前任最多</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Banana香蕉 × 拿拿酒馆 | 超绝的100个"谁最有可能"灵魂拷问，直接把场子炸到飞起！</p>
+        </footer>
+    </div>
+
+    <script>
+        // 问题数据
+        const questions = [
+            "谁前任最多",
+            "谁最八卦",
+            "谁最有可能吃回头草",
+            "谁最花心",
+            "谁最喜欢姐弟恋",
+            "谁恋爱脑最严重",
+            "谁分手后会最快找新欢",
+            "谁最可能为爱放弃事业",
+            "谁最喜欢冷暴力",
+            "谁最容易被细节打动",
+            "谁最会说情话",
+            "谁最喜欢当朋友的爱情军师",
+            "谁最喜欢网恋",
+            "谁最可能为爱纹身",
+            "谁看起来最能喝",
+            "谁记住最差",
+            "谁最喜欢看擦边视频",
+            "谁最像M",
+            "谁最好色",
+            "谁最可能被当变态",
+            "谁最喜欢画饼",
+            "谁最爱做白日梦",
+            "谁浏览器里奇怪的小网站最多",
+            "谁最可能在相亲网站注册账号",
+            "谁最喜欢玩角色扮演",
+            "谁最喜欢视杆前任",
+            "谁最可能发生办公室恋情",
+            "谁最可能当爱情舔狗",
+            "谁最可能变弯",
+            "谁最自恋",
+            "谁最喜欢拍“擦边”照片？",
+            "谁最有可能在喝醉后，主动找人索吻",
+            "谁最闪骚",
+            "谁最好骗",
+            "谁最喜欢放鸽子",
+            "谁当过小丑",
+            "谁单身时间最久",
+            "谁唱歌最难听",
+            "谁网恋被骗过钱",
+            "谁最容易emo",
+            "谁最爱立flag",
+            "谁最喜欢骂人",
+            "谁酒量最差",
+            "谁最爱哭",
+            "谁经常不回消息",
+            "谁的前任最多",
+            "谁的恋爱史最离谱",
+            "谁出门最墨迹",
+            "谁最信星座",
+            "谁最喜欢给别人取外号",
+            "谁最社恐",
+            "谁最社牛",
+            "谁最喜欢发疯",
+            "谁笑点最低",
+            "谁最爱买智商税的产品",
+            "谁暗恋过老师",
+            "谁最反差",
+            "谁谈恋爱后最喜欢秀恩爱",
+            "谁经常三天打鱼，两天晒网",
+            "谁最喜欢写小作文",
+            "谁的交友软件最多",
+            "谁最可能先结婚",
+            "谁最爱熬夜",
+            "谁最有事业心",
+            "谁最容易爱上渣男",
+            "谁经常不回家",
+            "谁最容易冲动消费",
+            "谁最可能相信算命",
+            "谁最能保守秘密",
+            "谁最容易在相亲中找到真爱",
+            "谁玩的最开",
+            "谁微信里关于宝宝的聊天记录最多",
+            "谁最容易被浪漫套路征服",
+            "谁最喜欢注册小号偷偷钓鱼",
+            "谁手机里交友软件最多",
+            "谁家里情趣内衣最多",
+            "谁的脾气最大",
+            "谁最有可能被包养",
+            "谁最有可能被渣",
+            "谁笑点最低",
+            "谁拖延症最严重",
+            "谁最怕打针",
+            "谁脸上动过",
+            "谁最爱记仇",
+            "谁最喜欢吃油炸食品",
+            "谁最念旧",
+            "谁经常不洗袜子",
+            "谁最喜欢看言情剧",
+            "谁手机里朋友的丑照最多",
+            "谁最喜欢看恐怖片",
+            "谁的微信名最土",
+            "谁的微信人数最多",
+            "谁的抖音关注帅哥最多",
+            "谁的黑历史最多",
+            "谁唱歌最难听",
+            "谁最喜欢聊骚",
+            "谁最喜欢写小作文",
+            "谁最能吃",
+            "谁最喜欢puq别人",
+            "谁的控制欲最强"
+        ];
+
+        // 当前问题索引
+        let currentIndex = 0;
+        // 浏览历史
+        let viewedQuestions = [0];
+        // 随机模式下访问过的问题
+        let randomViewed = new Set([0]);
+
+        // DOM元素
+        const questionText = document.getElementById('question-text');
+        const questionId = document.getElementById('question-id');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const showAllBtn = document.getElementById('show-all-btn');
+        const viewedCount = document.getElementById('viewed-count');
+        const progressBar = document.getElementById('progress-bar');
+        const historyList = document.getElementById('history-list');
+
+        // 初始化显示第一个问题
+        updateQuestion(currentIndex);
+
+        // 更新问题显示
+        function updateQuestion(index) {
+            questionText.textContent = questions[index];
+            questionId.textContent = index + 1;
+            
+            // 更新进度条
+            const viewedPercentage = (randomViewed.size / questions.length) * 100;
+            progressBar.style.width = `${viewedPercentage}%`;
+            viewedCount.textContent = randomViewed.size;
+            
+            // 更新历史记录
+            updateHistory();
+        }
+
+        // 更新历史记录显示
+        function updateHistory() {
+            historyList.innerHTML = '';
+            
+            // 只显示最近5个历史记录
+            const recentHistory = viewedQuestions.slice(-5);
+            
+            recentHistory.forEach(index => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.textContent = `#${index + 1} ${questions[index]}`;
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // 随机获取一个新问题
+        function getRandomQuestion() {
+            // 如果所有问题都已经显示过，重置
+            if (randomViewed.size >= questions.length) {
+                randomViewed.clear();
+                alert('所有问题已经浏览一遍，重新开始随机！');
+            }
+            
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * questions.length);
+            } while (randomViewed.has(randomIndex));
+            
+            randomViewed.add(randomIndex);
+            viewedQuestions.push(randomIndex);
+            currentIndex = randomIndex;
+            
+            updateQuestion(currentIndex);
+        }
+
+        // 显示上一个问题
+        function showPreviousQuestion() {
+            if (viewedQuestions.length > 1) {
+                // 移除当前问题
+                viewedQuestions.pop();
+                // 获取上一个问题
+                currentIndex = viewedQuestions[viewedQuestions.length - 1];
+                updateQuestion(currentIndex);
+            } else {
+                alert('已经是第一个问题了！');
+            }
+        }
+
+        // 显示全部问题
+        function showAllQuestions() {
+            let allQuestions = "=== 全部100个问题 ===\n\n";
+            questions.forEach((q, index) => {
+                allQuestions += `${index + 1}. ${q}\n`;
+            });
+            alert(allQuestions);
+        }
+
+        // 事件监听
+        nextBtn.addEventListener('click', getRandomQuestion);
+        
+        prevBtn.addEventListener('click', showPreviousQuestion);
+        
+        showAllBtn.addEventListener('click', showAllQuestions);
+
+        // 键盘快捷键支持
+        document.addEventListener('keydown', (e) => {
+            // 空格键或右箭头：下一题
+            if (e.code === 'Space' || e.code === 'ArrowRight') {
+                getRandomQuestion();
+                e.preventDefault();
+            }
+            // 左箭头：上一题
+            if (e.code === 'ArrowLeft') {
+                showPreviousQuestion();
+                e.preventDefault();
+            }
+            // A键：显示全部
+            if (e.code === 'KeyA') {
+                showAllQuestions();
+            }
+        });
+    </script>
+</body>
+</html>
